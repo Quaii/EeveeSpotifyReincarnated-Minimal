@@ -127,15 +127,14 @@ struct EeveeContributorsSheetView: View {
     var body: some View {
         NavigationView {
             contentView
+                .navigationTitle("contributors".localized)
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
-                    ToolbarItem(placement: .confirmationAction) {
-                        Button {
-                            WindowHelper.shared.dismissCurrentViewController()
-                        } label: {
-                            Image(systemName: "line.3.horizontal")
-                                .font(.system(size: 15, weight: .semibold))
-                        }
+                    Button {
+                        WindowHelper.shared.dismissCurrentViewController()
+                    } label: {
+                        Text("Done".uiKitLocalized)
+                            .font(.headline)
                     }
                 }
                 .onAppear {
@@ -218,4 +217,3 @@ struct EeveeContributorsSheetView: View {
         }
     }
 }
-

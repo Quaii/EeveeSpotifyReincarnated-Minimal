@@ -35,7 +35,7 @@ struct EeveeTroubleshootingSettingsView: View {
             Section(footer: Text("reset_section_footer".localized)) {
                 Button(action: showResetMenu) {
                     SettingsLabel(
-                        title: "reset_data".localized,
+                        title: "reset_section".localized,
                         subtitle: "reset_menu_subtitle".localized,
                         icon: "arrow.counterclockwise",
                         color: .orange,
