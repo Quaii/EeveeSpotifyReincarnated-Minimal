@@ -2,8 +2,12 @@ import SwiftUI
 
 struct EeveeSettingsVersionView: View {
     @State private var latestVersion: String?
-    @State private var isPresentingContributorsSheet = false
-    @State private var contributorAvatars: [String] = []
+    @State private var sections: [EeveeContributorSection] = []
+    @State private var sheetTarget: [String]?
+
+    private var allUsernames: [String] {
+        sections.flatMap(\.contributors).flatMap(\.usernames)
+    }
 
     private func loadVersion() async throws {
         let release = try await GitHubHelper.shared.getLatestRelease()
@@ -17,10 +21,14 @@ struct EeveeSettingsVersionView: View {
         latestVersion = version
     }
 
-    private func loadContributorAvatars() async {
-        guard let sections = try? await GitHubHelper.shared.getEeveeContributorSections() else { return }
-        let usernames = sections.flatMap(\.contributors).flatMap(\.usernames)
-        contributorAvatars = Array(usernames.prefix(6))
+    private func loadSections() async {
+        sections = (try? await GitHubHelper.shared.getEeveeContributorSections()) ?? []
+    }
+
+    private func openSheet(for username: String) {
+        // Burger passes an empty array: present the sheet without a scroll target.
+        let contributor = sections.flatMap(\.contributors).first { $0.usernames.contains(username) }
+        sheetTarget = contributor?.usernames ?? []
     }
 
     private var isUpdateAvailable: Bool {
@@ -45,54 +53,74 @@ struct EeveeSettingsVersionView: View {
     }
 
     var body: some View {
-        Section {
-            if isUpdateAvailable {
-                Link(
-                    "update_available".localized,
-                    destination: URL(string: "https://github.com/jaydenjcpy/EeveeSpotifyReincarnated/releases")!
-                )
-            }
-        } footer: {
-            VStack(alignment: .leading, spacing: 8) {
+        Group {
+            Section {
+                if isUpdateAvailable {
+                    Link(
+                        "update_available".localized,
+                        destination: URL(string: "https://github.com/jaydenjcpy/EeveeSpotifyReincarnated/releases")!
+                    )
+                }
+            } footer: {
                 if latestVersion == nil {
                     HStack(spacing: 10) {
                         ProgressView()
                         Text("checking_for_update".localized)
                     }
                 }
-                else {
-                    HStack(spacing: 6) {
-                        ForEach(contributorAvatars, id: \.self) { username in
-                            ImageView(urlString: "https://github.com/\(username).png")
-                                .frame(width: 28, height: 28)
-                                .clipShape(Circle())
-                        }
+            }
 
-                        Button {
-                            isPresentingContributorsSheet = true
-                        } label: {
-                            Image(systemName: "line.3.horizontal")
-                                .font(.system(size: 12, weight: .semibold))
-                                .foregroundColor(.gray)
-                                .frame(width: 28, height: 28)
-                                .background(Circle().fill(Color.gray.opacity(0.25)))
+            if !allUsernames.isEmpty {
+                // Full-bleed strip: spans the same left/right edges as the group
+                // panes, scrolls horizontally, burger opens the sheet at the end.
+                Section {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
+                            ForEach(allUsernames, id: \.self) { username in
+                                Button {
+                                    openSheet(for: username)
+                                } label: {
+                                    ImageView(urlString: "https://github.com/\(username).png")
+                                        .frame(width: 40, height: 40)
+                                        .clipShape(Circle())
+                                }
+                                .buttonStyle(.plain)
+                            }
+
+                            Button {
+                                sheetTarget = []
+                            } label: {
+                                Image(systemName: "line.3.horizontal")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.gray)
+                                    .frame(width: 40, height: 40)
+                                    .background(Circle().fill(Color.gray.opacity(0.25)))
+                            }
+                            .buttonStyle(.plain)
                         }
-                        .buttonStyle(.plain)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 2)
                     }
+                    .frame(height: 48)
                 }
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets())
             }
         }
-        .sheet(isPresented: $isPresentingContributorsSheet) {
-            EeveeContributorsSheetView()
+        .sheet(isPresented: Binding(
+            get: { sheetTarget != nil },
+            set: { if !$0 { sheetTarget = nil } }
+        )) {
+            EeveeContributorsSheetView(scrollTo: sheetTarget)
         }
 
         .animation(.default, value: latestVersion)
-        .animation(.default, value: contributorAvatars)
+        .animation(.default, value: sections)
 
         .onAppear {
             Task {
                 try await loadVersion()
-                await loadContributorAvatars()
+                await loadSections()
             }
         }
     }

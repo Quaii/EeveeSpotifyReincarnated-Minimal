@@ -5,34 +5,6 @@ struct EeveeSettingsView: View {
     let navigationController: UINavigationController
 
     @State private var hasShownCommonIssuesTip = UserDefaults.hasShownCommonIssuesTip
-    @State private var isClearingData = false
-
-    private func exportDebugLog() {
-        guard let data = FileManager.default.contents(atPath: EeveeLog.path), !data.isEmpty else {
-            PopUpHelper.showPopUp(message: "no_debug_log_found".localized, buttonText: "no_debug_log_found_ok".localized)
-            return
-        }
-        let share = UIActivityViewController(activityItems: [URL(fileURLWithPath: EeveeLog.path)], applicationActivities: nil)
-        if let popover = share.popoverPresentationController, let view = navigationController.view {
-            popover.sourceView = view
-            popover.sourceRect = CGRect(x: view.bounds.midX, y: view.bounds.midY, width: 0, height: 0)
-        }
-        WindowHelper.shared.present(share)
-    }
-
-    private func clearDebugLog() {
-        EeveeLog.clear()
-        writeDebugLog("Log cleared by user")
-        PopUpHelper.showPopUp(message: "debug_log_cleared".localized, buttonText: "debug_log_cleared_ok".localized)
-    }
-
-    private func wipe(_ work: @escaping () -> Void) {
-        isClearingData = true
-        DispatchQueue.global(qos: .userInitiated).async {
-            work()
-            DispatchQueue.main.async { exitApplication() }
-        }
-    }
 
     private static let groups: [SettingsGroup] = [
         SettingsGroup(key: "settings_group_listening", entries: [
@@ -45,6 +17,8 @@ struct EeveeSettingsView: View {
         SettingsGroup(key: "settings_group_advanced", entries: [
             SettingsEntry(key: "experiments", icon: "sparkle", color: .purple) { AnyView(EeveeExperimentsSettingsView()) },
             SettingsEntry(key: "miscellaneous", icon: "ellipsis.circle.fill", color: .gray) { AnyView(EeveeMiscellaneousSettingsView()) },
+            SettingsEntry(key: "debug", icon: "ant.fill", color: .green) { AnyView(EeveeDebugSettingsView()) },
+            SettingsEntry(key: "troubleshooting", icon: "wrench.and.screwdriver.fill", color: .blue) { AnyView(EeveeTroubleshootingSettingsView()) },
         ]),
     ]
 
@@ -78,46 +52,10 @@ struct EeveeSettingsView: View {
                 }
             }
 
-            Section(header: Text("troubleshooting".localized), footer: Text("debug_section_footer".localized)) {
-                Toggle(
-                    "debug_logging".localized,
-                    isOn: Binding<Bool>(
-                        get: { UserDefaults.debugLoggingEnabled },
-                        set: { UserDefaults.debugLoggingEnabled = $0 }
-                    )
-                )
-
-                Button(action: exportDebugLog) {
-                    SettingsLabel(title: "export_debug_log".localized, icon: "square.and.arrow.up", color: .blue)
-                }
-                Button(action: clearDebugLog) {
-                    SettingsLabel(title: "clear_debug_log".localized, icon: "trash.fill", color: .gray)
-                }
-            }
-
-            Section(header: Text("reset_section".localized), footer: Text("reset_section_footer".localized)) {
-                Button {
-                    confirmDestructive(title: "reset_data".localized, message: "reset_data_description".localized, confirm: "reset_data".localized) {
-                        wipe { OfflineHelper.resetData(clearCaches: true) }
-                    }
-                } label: {
-                    SettingsLabel(title: "reset_data".localized, subtitle: "reset_data_subtitle".localized, icon: "arrow.counterclockwise", color: .orange)
-                }
-                Button {
-                    confirmDestructive(title: "resetButtonTitle".localized, message: "resetFooter".localized, confirm: "resetButtonTitle".localized) {
-                        wipe { FullResetHelper.wipeSpotifyState() }
-                    }
-                } label: {
-                    SettingsLabel(title: "resetButtonTitle".localized, subtitle: "full_reset_subtitle".localized, icon: "exclamationmark.triangle.fill", color: .red)
-                }
-            }
-            .disabled(isClearingData)
-
             SpacerView()
         }
         .eeveeSettingsStyle()
 
-        .animation(.default, value: isClearingData)
         .animation(.default, value: hasShownCommonIssuesTip)
 
         .onAppear {

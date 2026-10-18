@@ -8,8 +8,9 @@ class EeveeSettingsViewController: SPTPageViewController {
     init(_ frame: CGRect, settingsView: AnyView, navigationTitle: String) {
         self.settingsView = settingsView
         super.init(nibName: nil, bundle: nil)
-        
-        title = navigationTitle
+
+        // Header stays chrome-only (back + globe); the hero below carries the name.
+        title = ""
     }
 
     required init?(coder: NSCoder) {
@@ -58,6 +59,6 @@ class EeveeSettingsViewController: SPTPageViewController {
     }
     
     @objc func openRepositoryUrl(_ sender: UIButton) {
-        UIApplication.shared.open(URL(string: "https://github.com/jaydenjcpy/EeveeSpotifyReincarnated")!)
+        UIApplication.shared.open(URL(string: "https://github.com/\(GeneratedConfig.repoSlug)")!)
     }
 }

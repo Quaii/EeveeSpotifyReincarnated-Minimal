@@ -115,21 +115,27 @@ private struct FullWidthSeparatorModifier: ViewModifier {
 }
 
 struct EeveeContributorsSheetView: View {
+    // First usernames of the contributor the sheet was opened from; the list
+    // scrolls to its row once loaded.
+    var scrollTo: [String]? = nil
+
     @State private var sections: [EeveeContributorSection] = []
     @State private var isLoading = true
     @State private var errorMessage: String? = nil
+    @State private var didScrollToTarget = false
 
     var body: some View {
         NavigationView {
             contentView
-                .navigationTitle("contributors".localized)
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
-                    Button {
-                        WindowHelper.shared.dismissCurrentViewController()
-                    } label: {
-                        Text("Done".uiKitLocalized)
-                            .font(.headline)
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button {
+                            WindowHelper.shared.dismissCurrentViewController()
+                        } label: {
+                            Image(systemName: "line.3.horizontal")
+                                .font(.system(size: 15, weight: .semibold))
+                        }
                     }
                 }
                 .onAppear {
@@ -169,18 +175,35 @@ struct EeveeContributorsSheetView: View {
     }
 
     private var contributorsList: some View {
-        List {
-            ForEach(sections, id: \.title) { section in
-                Section(header: Text(section.title)) {
-                    let contributors = section.shuffled ? section.contributors.shuffled() : section.contributors
-                    ForEach(contributors, id: \.usernames) { contributor in
-                        ContributorRow(contributor: contributor)
-                            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-                            .modifier(FullWidthSeparatorModifier())
+        ScrollViewReader { proxy in
+            List {
+                ForEach(sections, id: \.title) { section in
+                    Section(header: Text(section.title)) {
+                        let contributors = section.shuffled ? section.contributors.shuffled() : section.contributors
+                        ForEach(contributors, id: \.usernames) { contributor in
+                            ContributorRow(contributor: contributor)
+                                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                                .modifier(FullWidthSeparatorModifier())
+                                .id(contributor.usernames)
+                        }
                     }
                 }
             }
+            .onAppear { scrollToTarget(proxy) }
         }
+    }
+
+    private func scrollToTarget(_ proxy: ScrollViewProxy) {
+        guard !didScrollToTarget, let target = scrollTo, !target.isEmpty else { return }
+        let flattened = sections.flatMap { section in
+            section.contributors.map { ($0.usernames, section.shuffled) }
+        }
+        // Shuffled sections change order per launch; only scroll when the
+        // first occurrence is stable enough to be meaningful.
+        if let match = flattened.first(where: { $0.0 == target && !$0.1 }) {
+            withAnimation { proxy.scrollTo(match.0, anchor: .top) }
+        }
+        didScrollToTarget = true
     }
 
     private func loadContributors() {
@@ -195,3 +218,4 @@ struct EeveeContributorsSheetView: View {
         }
     }
 }
+

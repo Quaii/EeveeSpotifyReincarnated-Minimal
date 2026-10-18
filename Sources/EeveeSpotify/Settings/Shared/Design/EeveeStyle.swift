@@ -97,8 +97,16 @@ struct SettingsHero: View {
                 .frame(width: 64, height: 64)
                 .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
                 .shadow(color: EeveeTheme.accent.opacity(0.45), radius: 18)
-            Text("EeveeSpotify")
-                .font(.system(size: 26, weight: .bold, design: .rounded))
+            HStack(spacing: 8) {
+                Text("EeveeSpotify")
+                    .font(.system(size: 26, weight: .bold, design: .rounded))
+                Text("Minimal")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundColor(EeveeTheme.accent)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(Capsule().fill(EeveeTheme.accent.opacity(0.16)))
+            }
             Text("v\(EeveeSpotify.version) (build \(EeveeSpotify.buildNumber)) · Spotify \(EeveeSpotify.spotifyVersion)")
                 .font(.footnote.monospacedDigit())
                 .foregroundColor(.secondary)
