@@ -3,10 +3,9 @@ import UIKit
 
 struct EeveeSettingsView: View {
     let navigationController: UINavigationController
-    
+
     @State private var hasShownCommonIssuesTip = UserDefaults.hasShownCommonIssuesTip
     @State private var isClearingData = false
-    @State private var isPresentingDevNoteSheet = false
 
     private func exportDebugLog() {
         guard let data = FileManager.default.contents(atPath: EeveeLog.path), !data.isEmpty else {
@@ -27,15 +26,6 @@ struct EeveeSettingsView: View {
         PopUpHelper.showPopUp(message: "debug_log_cleared".localized, buttonText: "debug_log_cleared_ok".localized)
     }
 
-    // Ko-fi is where the tweak is funded from. It is the only place we ask for
-    // money, so the button lives with the other "about" style rows near the
-    // bottom of the page rather than up in the feature groups.
-    private static let supportURL = URL(string: "https://ko-fi.com/jaydenjcpy")!
-
-    private func openSupportPage() {
-        UIApplication.shared.open(Self.supportURL)
-    }
-
     private func wipe(_ work: @escaping () -> Void) {
         isClearingData = true
         DispatchQueue.global(qos: .userInitiated).async {
@@ -50,12 +40,9 @@ struct EeveeSettingsView: View {
             SettingsEntry(key: "sponsorblock", icon: "forward.end.fill", color: .red) { AnyView(SponsorBlockSettingsView()) },
         ]),
         SettingsGroup(key: "settings_group_looks", entries: [
-            SettingsEntry(key: "customization", icon: "paintpalette.fill", color: Color(hex: "#64D2FF")) { AnyView(EeveeUISettingsView()) },
             SettingsEntry(key: "appIcon", icon: "app.badge.fill", color: .pink) { AnyView(EeveeAppIconPickerView()) },
         ]),
         SettingsGroup(key: "settings_group_advanced", entries: [
-            SettingsEntry(key: "spotify_features", icon: "switch.2", color: .green) { AnyView(SpotifyFeaturesView()) },
-            SettingsEntry(key: "flags", icon: "flag.fill", color: Color(hex: "#5E5CE6")) { AnyView(FlagBrowserView()) },
             SettingsEntry(key: "experiments", icon: "sparkle", color: .purple) { AnyView(EeveeExperimentsSettingsView()) },
             SettingsEntry(key: "miscellaneous", icon: "ellipsis.circle.fill", color: .gray) { AnyView(EeveeMiscellaneousSettingsView()) },
         ]),
@@ -75,7 +62,7 @@ struct EeveeSettingsView: View {
             .listRowInsets(EdgeInsets())
 
             EeveeSettingsVersionView()
-            
+
             if !hasShownCommonIssuesTip {
                 CommonIssuesTipView(
                     onDismiss: {
@@ -84,35 +71,10 @@ struct EeveeSettingsView: View {
                     }
                 )
             }
-            
+
             ForEach(Self.groups) { group in
                 SettingsGroupSection(group: group) { entry in
                     SettingsNavigator.push(entry.make(), title: entry.key.localized)
-                }
-            }
-
-            Section {
-                Button {
-                    isPresentingDevNoteSheet = true
-                } label: {
-                    HStack {
-                        Image(systemName: "person.fill.questionmark")
-                        Text("\("developer_note".localized)...")
-                    }
-                }
-            }
-            .sheet(isPresented: $isPresentingDevNoteSheet) {
-                EeveeDevNoteView()
-            }
-
-            Section {
-                Button(action: openSupportPage) {
-                    SettingsLabel(
-                        title: "support_the_project".localized,
-                        subtitle: "support_the_project_description".localized,
-                        icon: "cup.and.saucer.fill",
-                        color: Color(hex: "#FF5E5B")
-                    )
                 }
             }
 
@@ -154,7 +116,7 @@ struct EeveeSettingsView: View {
             SpacerView()
         }
         .eeveeSettingsStyle()
-        
+
         .animation(.default, value: isClearingData)
         .animation(.default, value: hasShownCommonIssuesTip)
 

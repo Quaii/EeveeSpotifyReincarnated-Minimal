@@ -4,6 +4,7 @@ import UIKit
 struct EeveeMiscellaneousSettingsView: View {
     @State private var cleanShareLinks = UserDefaults.cleanShareLinks
     @State private var blockRatingPrompts = UserDefaults.blockRatingPrompts
+    @State private var darkPopUps = UserDefaults.darkPopUps
 
     var body: some View {
         List {
@@ -15,6 +16,10 @@ struct EeveeMiscellaneousSettingsView: View {
                 Toggle("clean_share_links".localized, isOn: $cleanShareLinks)
             }
 
+            Section {
+                Toggle("dark_popups".localized, isOn: $darkPopUps)
+            }
+
             RestartSection(visible: blockRatingPrompts != RatingPromptBlock.launchEnabled)
 
             SpacerView()
@@ -22,5 +27,6 @@ struct EeveeMiscellaneousSettingsView: View {
         .eeveeSettingsStyle()
         .onChange(of: cleanShareLinks) { UserDefaults.cleanShareLinks = $0 }
         .onChange(of: blockRatingPrompts) { UserDefaults.blockRatingPrompts = $0 }
+        .onChange(of: darkPopUps) { UserDefaults.darkPopUps = $0 }
     }
 }
