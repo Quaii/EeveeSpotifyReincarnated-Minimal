@@ -40,23 +40,6 @@ extension Color {
         return (r, g, b, a)
     }
 
-    func lighter(by amount: CGFloat = 0.2) -> Self { Self(UIColor(self).lighter(by: amount)) }
-    func darker(by amount: CGFloat = 0.2) -> Self { Self(UIColor(self).darker(by: amount)) }
-
-    var brightness: CGFloat {
-        (
-            components.red * 299
-            + components.green * 587
-            + components.blue * 114
-        ) / 1000
-    }
-
-    func normalized(_ by: CGFloat) -> Color {
-        brightness < 0.5
-            ? self.lighter(by: max(by - brightness, 0))
-            : self.darker(by: max(brightness - by, 0))
-    }
-    
     var hexString: String {
          String(
             format: "%02X%02X%02X",
@@ -64,13 +47,6 @@ extension Color {
             Int(components.green * 255),
             Int(components.blue * 255)
          )
-    }
-    
-    var uInt32: UInt32 {
-        UInt32(components.alpha * 255) << 24
-            | UInt32(components.red * 255) << 16
-            | UInt32(components.green * 255) << 8
-            | UInt32(components.blue * 255)
     }
 }
 

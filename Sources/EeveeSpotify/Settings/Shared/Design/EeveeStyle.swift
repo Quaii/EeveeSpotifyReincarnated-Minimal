@@ -1,9 +1,8 @@
 import SwiftUI
 
 enum EeveeTheme {
-    static var accent: Color {
-        Color(Theme.color(Theme.accentOrGreen(UserDefaults.accentRGB)))
-    }
+    // Spotify's brand green — the stock accent, now that custom accent colours are gone.
+    static let accent = Color(hex: "#1ED760")
 }
 
 struct EeveeSettingsStyle: ViewModifier {

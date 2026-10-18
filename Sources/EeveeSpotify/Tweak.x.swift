@@ -229,17 +229,6 @@ struct EeveeSpotify: Tweak {
         // Local-only premium force; independent of patching, so premium UI survives everything else being off.
         activateEeveePremiumForce()
 
-        activateTelemetryBlock()
-        activateTheme()
-        activateLiquidGlass()
-        activatePlayerGestures()
-        activatePlayerHaptics()
-        activateHomeDeclutter()
-        activateGlassCustomTabs()
-        activateHomeGradient()
-        activateArtistHides()
-        activatePlaylistHides()
-        HideJam.activate()
         activateRemoteFlags()
         activateRatingPromptBlock()
 
@@ -273,7 +262,6 @@ struct EeveeSpotify: Tweak {
         writeDebugLog("[INIT] iOS: \(iosVersion), Device: \(deviceModel)")
         writeDebugLog("[INIT] Hook target: \(EeveeSpotify.hookTarget)")
         writeDebugLog("[INIT] Patch type: \(UserDefaults.patchType)")
-        writeDebugLog("[INIT] Lyrics source: \(UserDefaults.lyricsSource)")
         writeDebugLog("[INIT] tweakInitTime: \(tweakInitTime)")
 
         activateCarPlayCrashFix()
@@ -315,38 +303,6 @@ struct EeveeSpotify: Tweak {
                 activateV91ServerSidedReminderIfAvailable()
             }
 
-            let lyricsEnabled = UserDefaults.lyricsSource.isReplacingLyrics
-
-            if lyricsEnabled {
-                let fullscreenOK: Bool = {
-                    if let cls = NSClassFromString("Lyrics_FullscreenElementPageImpl.FullscreenElementViewController") {
-                        return class_getInstanceMethod(cls, #selector(UIViewController.viewDidLoad)) != nil
-                    }
-                    return false
-                }()
-
-                let npvOK: Bool = {
-                    if let cls = NSClassFromString("NowPlaying_ScrollImpl.NPVScrollViewController") {
-                        return class_getInstanceMethod(cls, #selector(UIViewController.viewWillAppear(_:))) != nil
-                            && class_getInstanceMethod(cls, #selector(UIViewController.viewWillDisappear(_:))) != nil
-                    }
-                    return false
-                }()
-
-                if fullscreenOK {
-                    BaseLyricsGroup().activate()
-                } else {
-                    writeDebugLog("[INIT] Skipped BaseLyricsGroup (fullscreen VC missing)")
-                }
-
-                if npvOK {
-                    V91LyricsGroup().activate()
-                } else {
-                    writeDebugLog("[INIT] Skipped V91LyricsGroup (NPVScrollViewController missing)")
-                }
-
-            }
-
             if let cls = NSClassFromString("ProfileSettingsSection"),
                class_getInstanceMethod(cls, Selector(("numberOfRows"))) != nil,
                class_getInstanceMethod(cls, Selector(("didSelectRow:"))) != nil,
@@ -378,7 +334,6 @@ struct EeveeSpotify: Tweak {
             TrueShuffleHook.install()
             activateEeveeProbes()
             activateSponsorBlock()
-            activateKaraokeHooks()
             return
         }
 
@@ -393,19 +348,7 @@ struct EeveeSpotify: Tweak {
         if UserDefaults.patchType.isPatching {
             activatePremiumPatchingGroup()
         }
-        
-        if UserDefaults.lyricsSource.isReplacingLyrics {
-            BaseLyricsGroup().activate()
-            LyricsErrorHandlingGroup().activate()
-            
-            if EeveeSpotify.hookTarget == .latest {
-                ModernLyricsGroup().activate()
-            }
-            else {
-                LegacyLyricsGroup().activate()
-            }
-        }
-        
+
         UniversalSettingsIntegrationProfileGroup().activate()
         UniversalSettingsIntegrationSettingsVCGroup().activate()
         if NSClassFromString("RootSettingsViewController") != nil {
@@ -419,6 +362,5 @@ struct EeveeSpotify: Tweak {
 
         activateEeveeProbes()
         activateSponsorBlock()
-        activateKaraokeHooks()
     }
 }

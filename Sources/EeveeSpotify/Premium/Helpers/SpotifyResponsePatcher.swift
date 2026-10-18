@@ -1,7 +1,6 @@
 import Foundation
 
-// Shared by SPTDataLoaderServiceHook and HttpClientURLSessionHook. Lyrics is
-// kept in each caller because its async fetch doesn't fit a sync transform.
+// Shared by SPTDataLoaderServiceHook and HttpClientURLSessionHook.
 enum SpotifyResponsePatcher {
 
     // Patched customize body, replayed for 304s and post-startup re-fetches
@@ -76,11 +75,9 @@ enum SpotifyResponsePatcher {
 
     static func shouldModify(_ url: URL) -> Bool {
         let shouldPatchPremium = BasePremiumPatchingGroup.isActive || PremiumBootstrapGroup.isActive
-        let shouldReplaceLyrics = BaseLyricsGroup.isActive
         let isDAC = url.path.lowercased().contains("/dac/view/v1/")
 
-        return (shouldReplaceLyrics && url.isLyrics)
-            || (shouldPatchPremium && (
+        return (shouldPatchPremium && (
                 url.isBootstrap || url.isCustomize ||
                 url.isPremiumPlanRow || url.isPremiumBadge || url.isPlanOverview ||
                 isDAC

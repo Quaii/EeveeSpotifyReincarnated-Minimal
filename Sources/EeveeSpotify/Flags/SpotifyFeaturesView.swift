@@ -2,7 +2,6 @@ import SwiftUI
 
 struct SpotifyFeaturesView: View {
     @State private var version = 0
-    @State private var hideJam = UserDefaults.hideJam
     @State private var flagsDefault = FlagOverrides.areDefault(SpotifyFeaturesView.keys)
 
     private static let sections: [(header: String, rows: [(String, String)])] = [
@@ -49,17 +48,12 @@ struct SpotifyFeaturesView: View {
             }
             .id(version)
 
-            Section(footer: Text("features_hide_jam_footer".localized)) {
-                Toggle("features_hide_jam".localized, isOn: $hideJam)
-            }
-
-            SettingsResetSection(visible: hideJam || !flagsDefault) {
-                hideJam = false
+            SettingsResetSection(visible: !flagsDefault) {
                 FlagOverrides.clear(Self.keys)
                 version += 1
             }
 
-            if RemoteFlags.needsRestart || hideJam != HideJam.launchEnabled {
+            if RemoteFlags.needsRestart {
                 Section {
                     Button(action: exitApplication) {
                         Text("restart_now".localized).fontWeight(.semibold).frame(maxWidth: .infinity)
@@ -71,48 +65,11 @@ struct SpotifyFeaturesView: View {
             SpacerView()
         }
         .eeveeSettingsStyle()
-        .onChange(of: hideJam) { UserDefaults.hideJam = $0 }
         .onAppear(perform: refreshFlags)
         .onChange(of: version) { _ in refreshFlags() }
     }
 
     private func refreshFlags() {
         flagsDefault = FlagOverrides.areDefault(Self.keys)
-    }
-}
-
-enum HideJam {
-    static let launchEnabled = UserDefaults.hideJam
-
-    private static let flags = [
-        "ios-feature-nowplaying.jam_queue_button_enabled",
-        "ios-referrals-jamqueueentrypointimpl.referrals_jam_queue_enabled",
-        "ios-jam-queueintegrationimpl.enable_guest_controls_queue_header_entry_point",
-        "ios-sociallistening-attachments-impl.enable_group_session_attachment",
-        "ios-feature-sociallisteningconnectentitylogic.enable_phone_speaker_host_approval",
-        "ios-feature-sociallisteningconnectentitylogic.enable_host_approval_flow",
-        "ios-feature-jamdevicepickerintegration.enable_host_approval_flow",
-        "ios-feature-sociallisteningconnectentitylogic.show_nearby_jam_nudge",
-        "ios-feature-sociallisteningconnectentitylogic.nearby_session_invitation_enabled",
-        "ios-feature-sociallisteningconnectentitylogic.nearby_session_enable_visibility_filter",
-        "ios-sociallistening-joingroupsession-impl.jam_deeplink_handler_enabled",
-        "ios-sociallistening-joingroupsession-impl.is_nearby_jam_invite_deeplink_enabled",
-        "ios-feature-jamuiimpl.enable_deeplink_flow",
-        "ios-sociallistening-localnetworkbroadcasting.enable_broadcasting",
-        "ios-sociallistening-localnetworksessionfinder.enable_discovery_v2",
-        "ios-jam-participantsettingspageimpl.enable_guest_controls_sheet",
-        "ios-jam-learnmoresheet.enable_invites_learn_more_sheet",
-    ]
-
-    static func activate() {
-        guard launchEnabled else { return }
-        RemoteFlags.shared.force(Dictionary(uniqueKeysWithValues: flags.map { ($0, false) }), by: "HideJam")
-    }
-}
-
-extension UserDefaults {
-    static var hideJam: Bool {
-        get { container.bool(forKey: "eeveeHideJam") }
-        set { container.set(newValue, forKey: "eeveeHideJam") }
     }
 }

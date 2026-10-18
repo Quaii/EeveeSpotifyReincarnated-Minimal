@@ -3,28 +3,16 @@ import Foundation
 extension UserDefaults {
     static var container: UserDefaults = .standard
     
-    private static let musixmatchTokenKey = "musixmatchToken"
     private static let darkPopUpsKey = "darkPopUps"
     private static let debugLoggingEnabledKey = "debugLoggingEnabled"
     private static let patchTypeKey = "patchType"
     private static let trueShuffleEnabledKey = "trueShuffleEnabled"
     private static let overwriteConfigurationKey = "overwriteConfiguration"
-    private static let lyricsColorsKey = "lyricsColors"
-    private static let lyricsOptionsKey = "lyricsOptions"
     private static let hasShownCommonIssuesTipKey = "hasShownCommonIssuesTip"
     private static let hasPatchedBootstrapKey = "eeveeHasPatchedBootstrap"
     private static let cachedCustomizeDataKey = "eeveeCachedCustomizeData"
     private static let iconNamePrettifyKey = "iconNamePrettify"
     private static let cleanShareLinksKey = "cleanShareLinks"
-
-    static var musixmatchToken: String {
-        get {
-            container.string(forKey: musixmatchTokenKey) ?? ""
-        }
-        set (token) {
-            container.set(token, forKey: musixmatchTokenKey)
-        }
-    }
 
     static var darkPopUps: Bool {
         get {
@@ -126,10 +114,5 @@ extension UserDefaults {
         set (cleanShareLinks) {
             container.set(cleanShareLinks, forKey: cleanShareLinksKey)
         }
-    }
-
-    static var roundedArtwork: Bool {
-        get { container.bool(forKey: "eeveeRoundedArtwork") }
-        set { container.set(newValue, forKey: "eeveeRoundedArtwork") }
     }
 }

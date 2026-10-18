@@ -20,25 +20,12 @@ extension String {
         String(format: self.localized, arguments: arguments)
     }
 
-    var range: NSRange { 
-        NSRange(self.startIndex..., in: self) 
-    }
-
-    var strippedTrackTitle: String {
-        String(
-            self
-            .removeMatches("\\(.*\\)")
-            .removeMatches("- .*")
-            .trimmingCharacters(in: .whitespaces)
-        )
+    var range: NSRange {
+        NSRange(self.startIndex..., in: self)
     }
 
     var isHex: Bool {
         self ~= "^[a-f0-9]+$"
-    }
-
-    var lyricsNoteIfEmpty: String {
-        self.isEmpty ? "♪" : self
     }
 
     var isRTL: Bool {
@@ -83,13 +70,9 @@ extension String {
         try! NSRegularExpression(pattern: pattern)
             .stringByReplacingMatches(
                 in: self, 
-                range: self.range,
+                range: self.range, 
                 withTemplate: ""
             )
-    }
-    
-    var isCanBeRomanizedLanguage: Bool {
-        ["ja", "ko", "z1"].contains(self) || self.contains("zh")
     }
     
     var hexadecimal: Data? {
