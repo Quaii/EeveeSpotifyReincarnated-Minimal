@@ -9,8 +9,7 @@ class EeveeSettingsViewController: SPTPageViewController {
         self.settingsView = settingsView
         super.init(nibName: nil, bundle: nil)
 
-        // Header stays chrome-only (back + globe); the hero below carries the name.
-        title = ""
+        title = navigationTitle
     }
 
     required init?(coder: NSCoder) {

@@ -24,7 +24,7 @@ class ProfileSettingsSectionHook: ClassHook<NSObject> {
             let eeveeSettingsController = EeveeSettingsViewController(
                 rootSettingsController.view.bounds,
                 settingsView: AnyView(EeveeSettingsView(navigationController: navigationController)),
-                navigationTitle: "EeveeSpotify"
+                navigationTitle: "EeveeSpotify - Minimal"
             )
             
             //

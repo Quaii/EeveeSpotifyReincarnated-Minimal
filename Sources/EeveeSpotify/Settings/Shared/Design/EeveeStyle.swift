@@ -100,14 +100,16 @@ struct SettingsHero: View {
             HStack(spacing: 8) {
                 Text("EeveeSpotify")
                     .font(.system(size: 26, weight: .bold, design: .rounded))
+                // Centered on the title's top edge, like a floating badge.
                 Text("Minimal")
                     .font(.caption2.weight(.semibold))
                     .foregroundColor(EeveeTheme.accent)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 3)
                     .background(Capsule().fill(EeveeTheme.accent.opacity(0.16)))
+                    .offset(y: -10)
             }
-            Text("v\(EeveeSpotify.version) (build \(EeveeSpotify.buildNumber)) · Spotify \(EeveeSpotify.spotifyVersion)")
+            Text("v\(EeveeSpotify.version) · Spotify \(EeveeSpotify.spotifyVersion)")
                 .font(.footnote.monospacedDigit())
                 .foregroundColor(.secondary)
         }

@@ -35,7 +35,9 @@ struct GitHubHelper {
     func getEeveeContributorSections() async throws -> [EeveeContributorSection] {
         let (data, _) = try await URLSession.shared.data(
             from: URL(
-                string: "https://raw.githubusercontent.com/\(EeveeSpotify.repoSlug)/refs/heads/\(GeneratedConfig.branchName)/contributors.json"
+                // HEAD follows the default branch, so the fetch survives the
+                // build branch being renamed or deleted.
+                string: "https://raw.githubusercontent.com/\(EeveeSpotify.repoSlug)/HEAD/contributors.json"
             )!
         )
         return try decoder.decode([EeveeContributorSection].self, from: data)

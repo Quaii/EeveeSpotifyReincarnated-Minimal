@@ -72,7 +72,7 @@ class UniversalProfileSettingsSectionHook: ClassHook<NSObject> {
         let eeveeSettingsController = EeveeSettingsViewController(
             rootController.view.bounds,
             settingsView: AnyView(EeveeSettingsView(navigationController: navigationController)),
-            navigationTitle: "EeveeSpotify"
+            navigationTitle: "EeveeSpotify - Minimal"
         )
         
         let button = UIButton()
@@ -131,7 +131,7 @@ func injectEeveeButton(into target: UIViewController) {
         let eeveeSettingsController = EeveeSettingsViewController(
             target.view.bounds,
             settingsView: AnyView(EeveeSettingsView(navigationController: navigationController)),
-            navigationTitle: "EeveeSpotify"
+            navigationTitle: "EeveeSpotify - Minimal"
         )
         
         // Add GitHub button to the Eevee settings page itself
@@ -337,7 +337,7 @@ private func pushEeveeSettings(from vc: UIViewController) {
     let host = EeveeSettingsViewController(
         vc.view.bounds,
         settingsView: AnyView(EeveeSettingsView(navigationController: nav)),
-        navigationTitle: "EeveeSpotify"
+        navigationTitle: "EeveeSpotify - Minimal"
     )
 
     let subButton = UIButton(type: .system)

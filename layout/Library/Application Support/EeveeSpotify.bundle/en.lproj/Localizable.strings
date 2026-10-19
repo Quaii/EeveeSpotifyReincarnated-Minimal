@@ -334,6 +334,7 @@ tab_bar_editor_hint = "Tap a tab to open on launch. Hold and drag to reorder, dr
 settings_group_listening = "Listening";
 settings_group_looks = "Looks";
 settings_group_advanced = "Advanced";
+settings_group_other = "Other";
 patching_subtitle = "Premium patching";
 lyrics_subtitle = "Sources and display";
 sponsorblock_subtitle = "Skip podcast segments";
