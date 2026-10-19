@@ -14,13 +14,13 @@ struct EeveeSettingsView: View {
         SettingsGroup(key: "settings_group_looks", entries: [
             SettingsEntry(key: "appIcon", icon: "app.badge.fill", color: .pink) { AnyView(EeveeAppIconPickerView()) },
         ]),
+        SettingsGroup(key: "settings_group_other", entries: [
+            SettingsEntry(key: "miscellaneous", icon: "ellipsis.circle.fill", color: .gray) { AnyView(EeveeMiscellaneousSettingsView()) },
+        ]),
         SettingsGroup(key: "settings_group_advanced", entries: [
             SettingsEntry(key: "experiments", icon: "sparkle", color: .purple) { AnyView(EeveeExperimentsSettingsView()) },
             SettingsEntry(key: "debug", icon: "ant.fill", color: .green) { AnyView(EeveeDebugSettingsView()) },
             SettingsEntry(key: "troubleshooting", icon: "wrench.and.screwdriver.fill", color: .blue) { AnyView(EeveeTroubleshootingSettingsView()) },
-        ]),
-        SettingsGroup(key: "settings_group_other", entries: [
-            SettingsEntry(key: "miscellaneous", icon: "ellipsis.circle.fill", color: .gray) { AnyView(EeveeMiscellaneousSettingsView()) },
         ]),
     ]
 
